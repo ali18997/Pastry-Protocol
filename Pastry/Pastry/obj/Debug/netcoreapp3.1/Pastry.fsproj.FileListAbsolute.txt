@@ -16,7 +16,6 @@ C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcorea
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\obj\Debug\netcoreapp3.1\Pastry.fsprojAssemblyReference.cache
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\obj\Debug\netcoreapp3.1\Pastry.AssemblyInfoInputs.cache
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\obj\Debug\netcoreapp3.1\Pastry.AssemblyInfo.fs
-C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\obj\Debug\netcoreapp3.1\Pastry.fsproj.CoreCompileInputs.cache
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\obj\Debug\netcoreapp3.1\Pastry.fsproj.CopyComplete
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Akka.dll
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Microsoft.Win32.SystemEvents.dll
@@ -43,3 +42,14 @@ C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcorea
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Logging.dll
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Akka.Cluster.dll
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Pastry.deps.json
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Pastry.runtimeconfig.json
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Pastry.runtimeconfig.dev.json
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Pastry.dll
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Pastry.pdb
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\Akka.FSharp.dll
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\FSharp.Quotations.Evaluator.dll
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\bin\Debug\netcoreapp3.1\FsPickler.dll
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\obj\Debug\netcoreapp3.1\Pastry.dll
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\obj\Debug\netcoreapp3.1\Pastry.pdb
+C:\Users\moham\Documents\GitHub\Pastry-Protocol\Pastry\Pastry\obj\Debug\netcoreapp3.1\Pastry.genruntimeconfig.cache
