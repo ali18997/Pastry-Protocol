@@ -2,7 +2,7 @@
   "profiles": {
     "Pastry": {
       "commandName": "Project",
-      "commandLineArgs": "10 10"
+      "commandLineArgs": "30 10"
     }
   }
 }

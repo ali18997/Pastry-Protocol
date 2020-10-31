@@ -16,6 +16,7 @@ let mutable exitNodes = 0
 
 let mutable messageGenerated = 0
 let mutable messageDelivered = 0
+let mutable totalHops = 0
 let mutable flag = true
 
 
@@ -23,6 +24,7 @@ type Message() =
     [<DefaultValue>] val mutable dst: int
     [<DefaultValue>] val mutable curr: int
     [<DefaultValue>] val mutable from: int
+    [<DefaultValue>] val mutable hops: int
 
 let killActor num = 
     arrayActor.[int num] <! PoisonPill.Instance
@@ -78,11 +80,12 @@ let binaryToInt32 binNum =
         power <- power - double 1
     (int)total
     
-let sendMessage dst curr from = 
+let sendMessage dst curr from hops = 
     let sendMsg = new Message()
     sendMsg.dst <- dst
     sendMsg.curr <- curr
     sendMsg.from <- from
+    sendMsg.hops <- hops
     arrayActor.[int curr] <! sendMsg
     
 let route dst curr from =
@@ -117,24 +120,29 @@ let actor (actorMailbox:Actor<Message>) =
         let currentTime = double (timer.ElapsedMilliseconds)
         
         if msg.curr <> msg.dst then
-            route msg.dst msg.curr msg.from
+            route msg.dst msg.curr msg.from (msg.hops + 1)
         elif msg.curr = msg.dst && msg.from <> msg.curr then
             messageDelivered <- messageDelivered + 1
+            totalHops <- totalHops + msg.hops
+            printfn "Message Delivered %A" messageDelivered
+            printfn "Avg Hops %A" ((double)totalHops/(double)messageDelivered)
         elif currentTime > 1000.0 && count < numRequests + 1 then
             timer.Reset()
             timer.Start()
             count <- count + 1
             let toSend = getNeighbour msg.curr
             messageGenerated <- messageGenerated + 1
-            route (toSend) (msg.curr) (msg.curr)
+            printfn "Message Generated %A" messageGenerated
+            route (toSend) (msg.curr) (msg.curr) 0
         elif messageDelivered = numNodes*numRequests && flag then
             timer.Stop()
             flag <- false
             printfn "Done"
+            printfn "Avg Hops %A" ((double)totalHops/(double)messageDelivered)
             killAll true
 
         if flag then
-            sendMessage (msg.curr) (msg.curr) (msg.curr)
+            sendMessage (msg.curr) (msg.curr) (msg.curr) 0
         
         return! actorLoop()
     }
@@ -158,7 +166,7 @@ let main (args) =
     
     makeActors true
 
-    sendMessage 0 0 0
+    sendMessage 0 0 0 0
 
     System.Console.ReadKey() |> ignore
 
