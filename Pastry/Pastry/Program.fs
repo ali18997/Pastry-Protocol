@@ -42,7 +42,7 @@ let intToBinary i =
     let binNum = intToBinary2 i
     (addZeros binNum (32-binNum.Length))
 
-let mismatch num dest = 
+let longestPrefixMatch num dest = 
     let num = (string) num
     let dest = (string) dest
     let mutable next = ""
@@ -62,18 +62,9 @@ let route num dest =
     let binNum = intToBinary num
     let binDest = intToBinary dest
 
-    let mismatch1, mismatch2 = (mismatch binNum binDest)
+    let longestPrefixMatchNum, nextNode = (longestPrefixMatch binNum binDest)
     
-    printfn "%A %A" binNum binDest
-    printfn "%A %A" mismatch1 mismatch2
-
-    let mismatch3, mismatch4 = (mismatch mismatch2 binDest)
-
-    printfn "%A %A" mismatch3 mismatch4
-
-    let mismatch5, mismatch6 = (mismatch mismatch4 binDest)
-
-    printfn "%A %A" mismatch5 mismatch6
+    nextNode
 
 let getNeighbour currentNum = 
     let objrandom = new Random()
