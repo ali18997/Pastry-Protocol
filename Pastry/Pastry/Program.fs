@@ -124,6 +124,7 @@ let actor (actorMailbox:Actor<Message>) =
         elif msg.curr = msg.dst && msg.from <> msg.curr then
             messageDelivered <- messageDelivered + 1
             totalHops <- totalHops + msg.hops
+            printfn "Message Generated %A" messageGenerated
             printfn "Message Delivered %A" messageDelivered
             printfn "Avg Hops %A" ((double)totalHops/(double)messageDelivered)
         elif currentTime > 1000.0 && count < numRequests + 1 then
@@ -133,6 +134,8 @@ let actor (actorMailbox:Actor<Message>) =
             let toSend = getNeighbour msg.curr
             messageGenerated <- messageGenerated + 1
             printfn "Message Generated %A" messageGenerated
+            printfn "Message Delivered %A" messageDelivered
+            printfn "Avg Hops %A" ((double)totalHops/(double)messageDelivered)
             route (toSend) (msg.curr) (msg.curr) 0
         elif messageDelivered = numNodes*numRequests && flag then
             timer.Stop()
@@ -141,7 +144,7 @@ let actor (actorMailbox:Actor<Message>) =
             printfn "Avg Hops %A" ((double)totalHops/(double)messageDelivered)
             killAll true
 
-        if flag then
+        if count < numRequests + 1 then
             sendMessage (msg.curr) (msg.curr) (msg.curr) 0
         
         return! actorLoop()
