@@ -25,6 +25,56 @@ let killAll start =
     for i = 0 to numNodes-1 do
         killActor i
 
+let addZeros num zeroNum = 
+    let mutable zeros = ""
+    for i = 0 to zeroNum-1 do
+        zeros <- zeros + "0"
+    zeros + num
+
+let rec intToBinary2 i =
+    match i with
+    | 0 | 1 -> string i
+    | _ ->
+        let bit = string (i % 2)
+        (intToBinary2 (i / 2)) + bit
+
+let intToBinary i = 
+    let binNum = intToBinary2 i
+    (addZeros binNum (32-binNum.Length))
+
+let mismatch num dest = 
+    let num = (string) num
+    let dest = (string) dest
+    let mutable next = ""
+    let mutable retVal = -1
+    for i = 0 to 31 do
+        if dest.[i] <> num.[i] then
+            if retVal = -1 then
+                retVal <- i
+                next <- next + (string)dest.[i]
+            else
+                next <- next + (string)num.[i]
+        else
+            next <- next + (string)num.[i]
+    retVal, next
+    
+let route num dest =
+    let binNum = intToBinary num
+    let binDest = intToBinary dest
+
+    let mismatch1, mismatch2 = (mismatch binNum binDest)
+    
+    printfn "%A %A" binNum binDest
+    printfn "%A %A" mismatch1 mismatch2
+
+    let mismatch3, mismatch4 = (mismatch mismatch2 binDest)
+
+    printfn "%A %A" mismatch3 mismatch4
+
+    let mismatch5, mismatch6 = (mismatch mismatch4 binDest)
+
+    printfn "%A %A" mismatch5 mismatch6
+
 let getNeighbour currentNum = 
     let objrandom = new Random()
     let ran = objrandom.Next(0,numNodes)
@@ -99,6 +149,8 @@ let main (args) =
     makeActors true
 
     sendMessage 0 0
+
+    route (10 ) (40) 
 
     System.Console.ReadKey() |> ignore
 
