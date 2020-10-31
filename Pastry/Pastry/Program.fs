@@ -14,8 +14,14 @@ let mutable numRequests = 0
 let mutable arrayActor : IActorRef array = null
 let mutable exitNodes = 0
 
+let mutable messageGenerated = 0
+let mutable messageDelivered = 0
+let mutable flag = true
+
+
 type Message() = 
-    [<DefaultValue>] val mutable num: int
+    [<DefaultValue>] val mutable dst: int
+    [<DefaultValue>] val mutable curr: int
     [<DefaultValue>] val mutable from: int
 
 let killActor num = 
@@ -31,15 +37,15 @@ let addZeros num zeroNum =
         zeros <- zeros + "0"
     zeros + num
 
-let rec intToBinary2 i =
+let rec int32ToBinary2 i =
     match i with
     | 0 | 1 -> string i
     | _ ->
         let bit = string (i % 2)
-        (intToBinary2 (i / 2)) + bit
+        (int32ToBinary2 (i / 2)) + bit
 
-let intToBinary i = 
-    let binNum = intToBinary2 i
+let int32ToBinary i = 
+    let binNum = int32ToBinary2 i
     (addZeros binNum (32-binNum.Length))
 
 let longestPrefixMatch num dest = 
@@ -53,37 +59,52 @@ let longestPrefixMatch num dest =
                 retVal <- i
                 next <- next + (string)dest.[i]
             else
-                next <- next + (string)num.[i]
+                next <- next + "0"
         else
             next <- next + (string)num.[i]
     retVal, next
-    
-let route num dest =
-    let binNum = intToBinary num
-    let binDest = intToBinary dest
 
-    let longestPrefixMatchNum, nextNode = (longestPrefixMatch binNum binDest)
+let binaryToInt32 binNum =
+    let charToInt charNum = 
+        if charNum = '1' then
+            1
+        else
+            0
+    let binNum = string binNum
+    let mutable power = double 31
+    let mutable total = double 0
+    for i = 0 to 31 do
+        total <- total + ((double) (charToInt binNum.[i]))*((double 2)**power)
+        power <- power - double 1
+    (int)total
     
-    nextNode
+let sendMessage dst curr from = 
+    let sendMsg = new Message()
+    sendMsg.dst <- dst
+    sendMsg.curr <- curr
+    sendMsg.from <- from
+    arrayActor.[int curr] <! sendMsg
+    
+let route dst curr from =
+    let binCurr = int32ToBinary curr
+    let binDst = int32ToBinary dst
+
+    let longestPrefixMatchNum, nextNode = (longestPrefixMatch binCurr binDst)
+    sendMessage dst (binaryToInt32 nextNode) from
+
 
 let getNeighbour currentNum = 
     let objrandom = new Random()
-    let ran = objrandom.Next(0,numNodes)
+    let mutable ran = objrandom.Next(0,numNodes)
+    while(ran = currentNum) do
+        ran <- objrandom.Next(0,numNodes)
     ran
-
-let sendMessage num from = 
-    let sendMsg = new Message()
-    sendMsg.num <- num
-    sendMsg.from <- from
-    arrayActor.[int num] <! sendMsg
-
 
 
 //Actor
 let actor (actorMailbox:Actor<Message>) = 
     //Actor Loop that will process a message on each iteration
     let mutable count = 0
-    let mutable flag = true
     let timer = new Stopwatch()
     let rec actorLoop() = actor {
 
@@ -93,29 +114,27 @@ let actor (actorMailbox:Actor<Message>) =
         if count = 0 then
             timer.Start()
             count <- count + 1
-            //printfn "Actor %A Count %A" msg.num count
         let currentTime = double (timer.ElapsedMilliseconds)
         
-        if msg.from <> msg.num then
-            count <- count
-        elif currentTime > 1000.0 && count < numRequests + 2 then
+        if msg.curr <> msg.dst then
+            route msg.dst msg.curr msg.from
+        elif msg.curr = msg.dst && msg.from <> msg.curr then
+            messageDelivered <- messageDelivered + 1
+        elif currentTime > 1000.0 && count < numRequests + 1 then
             timer.Reset()
             timer.Start()
             count <- count + 1
-            //printfn "Actor %A Count %A" msg.num count
-            sendMessage (getNeighbour msg.num) (msg.num)
-        elif count >= numRequests + 2 then
+            let toSend = getNeighbour msg.curr
+            messageGenerated <- messageGenerated + 1
+            route (toSend) (msg.curr) (msg.curr)
+        elif messageDelivered = numNodes*numRequests && flag then
             timer.Stop()
-            if flag then
-                exitNodes <- exitNodes + 1
-                flag <- false
-                //printfn "Actor %A exited Exit Count %A" msg.num exitNodes
-                if exitNodes = numNodes then
-                    printfn "Done"
-                    killAll true
+            flag <- false
+            printfn "Done"
+            killAll true
 
         if flag then
-            sendMessage (msg.num) (msg.num)
+            sendMessage (msg.curr) (msg.curr) (msg.curr)
         
         return! actorLoop()
     }
@@ -139,9 +158,7 @@ let main (args) =
     
     makeActors true
 
-    sendMessage 0 0
-
-    route (10 ) (40) 
+    sendMessage 0 0 0
 
     System.Console.ReadKey() |> ignore
 
