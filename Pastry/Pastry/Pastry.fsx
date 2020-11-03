@@ -476,11 +476,12 @@ let child (mailbox: Actor<_>) =
             let mutable nHops = noOfHops
             let nextID = route destID level "route"
 
-            //Threading.Thread.Sleep(1000)
+            
 
             if(isNull nextID) then
                 parentRef<! Finished (nHops)
             else
+                //Threading.Thread.Sleep(1000)
                 nHops<-nHops+1
                 let newLevel = checkPrefix destID nextID
                 let nextHop = system.ActorSelection("akka://system/user/"+nextID) 
@@ -534,7 +535,7 @@ let parent (mailbox: Actor<_>) =
                 //printfn "Child Joined:%d" childNodeNo
                 parentRef<!Init(childNodeNo)
             else
-                printfn "Done"
+                //printfn "Done"
                 Threading.Thread.Sleep(1000)
                 //println(numNodes + " nodes have joined ...\n")
                 //println("Initializing Routing ...\n")
@@ -566,15 +567,13 @@ let parent (mailbox: Actor<_>) =
         | Finished(nHops) ->
             terminateCount<-terminateCount+1
             totalHops<-totalHops+(double nHops)
-            printfn "%d" terminateCount
+            //printfn "%d" terminateCount
             if(terminateCount>=(totalNodes*totalRequests)) then
                 Threading.Thread.Sleep(1000)
-                printfn "All nodes have finished routing ..."
-                printfn "===================================="
-                printfn "TOTAL ROUTES = %d" (totalNodes * totalRequests)
-                printfn "TOTAL HOPS = %f" totalHops
-                printfn "AVERAGE HOPS PER ROUTE = %f" (totalHops / (double (totalNodes * totalRequests)))
-                printfn "===================================="
+                printfn "All nodes have finished routing"
+                printfn "Total routes = %d" (totalNodes * totalRequests)
+                printfn "Total hops = %f" totalHops
+                printfn "Average hops per route = %f" (totalHops / (double (totalNodes * totalRequests)))
 
                 printfn ""
                 printfn "Press Any Key To Close"
@@ -586,5 +585,18 @@ let parent (mailbox: Actor<_>) =
     }
     loop()
 
+//Get the arguments
+let args : string array = fsi.CommandLineArgs |> Array.tail
+
+//Extract and convert to Int
+let numNodes = args.[0]|> int
+let numReq = args.[1]|> int
+
+
 let parentActor = spawn system "parent" parent
-parentActor <! IntializeParent(1000,10,parentActor)
+parentActor <! IntializeParent(numNodes,numReq,parentActor)
+
+System.Console.ReadKey() |> ignore
+
+// let parentActor = spawn system "parent" parent
+// parentActor <! IntializeParent(10000,1,parentActor)
