@@ -30,6 +30,10 @@ type ProcessorMessage =
     | Forward of string*int*int
     | Finished of int
 
+// let (s:int list) = [1..10]
+// let (m:int list) = List.map (fun elem->elem+1) s
+// printfn "%A" m
+
 // let set1 = Set.empty.Add(3).Add(5).Add(7). Add(9)
 // let mutable set2 = set1
 // set2<-Set.remove 7 set2
@@ -235,53 +239,85 @@ let child (mailbox: Actor<_>) =
             nextID <- null
             found <- true
 
-        //check to see if any node in the leaf sets is closer to the new node than the current node
-        if (not found) then
-            //search in leaf tables first
-            if(destIntID>currIntID) then
-                if(not (List.isEmpty largeLeafList)) then
-                    if(func = "join") then
-                        if(destIntID<int("0o" + string (List.last largeLeafList))) then
-                            nextDestIntID<-currIntID
-                            let mutable d = destIntID-currIntID
-                            for i in largeLeafList do
-                                if(Math.Abs (int ("0o"+(string i))-destIntID)<d) then
-                                    d<-Math.Abs (int ("0o"+(string i))-destIntID)
-                                    nextDestIntID<-int ("0o" + string i)
-                    else
-                        if(destIntID<=int("0o" + string (List.last largeLeafList))) then
-                            nextDestIntID<-currIntID
-                            let mutable d = destIntID-currIntID
-                            for i in largeLeafList do
-                                if(Math.Abs (int ("0o"+(string i))-destIntID)<d) then
-                                    d<-Math.Abs (int ("0o"+(string i))-destIntID)
-                                    nextDestIntID<-int ("0o" + string i)
-            else
-                if(not (List.isEmpty smallLeafList)) then
-                    if(func = "join") then
-                        if(destIntID>int("0o" + string (List.head smallLeafList))) then
-                            nextDestIntID<-currIntID
-                            let mutable d = currIntID-destIntID
-                            for i in smallLeafList do
-                                if(Math.Abs (int ("0o"+(string i))-destIntID)<d) then
-                                    d<-Math.Abs (int ("0o"+(string i))-destIntID)
-                                    nextDestIntID<-int ("0o" + string i)
-                    else
-                        if(destIntID>=int("0o" + string (List.head smallLeafList))) then
-                            nextDestIntID<-currIntID
-                            let mutable d = currIntID-destIntID
-                            for i in smallLeafList do
-                                if(Math.Abs (int ("0o"+(string i))-destIntID)<d) then
-                                    d<-Math.Abs (int ("0o"+(string i))-destIntID)
-                                    nextDestIntID<-int ("0o" + string i)
-        
-        if(nextDestIntID<>(-1) && nextDestIntID<>currIntID) then  
-            nextID <- toBaseString nextDestIntID (int (Math.Pow(2.0,double b))) maxBits
-            found <- true
+        if(not found) then
+            let mutable leaves = List.empty
+            let mutable sl = smallLeafList
+            sl<- List.map (fun elem->(int ("0o"+(string elem)))) sl
+            leaves<- List.append leaves sl
+            
+            leaves<-List.append leaves [currIntID]
+
+            let mutable ll = largeLeafList
+            ll<- List.map (fun elem->(int ("0o"+(string elem)))) ll
+            leaves<- List.append leaves ll
+
+            if(destIntID>=List.head leaves && destIntID<=List.last leaves) then
+                let mutable nextDestIntID = List.head leaves
+                let mutable d = Math.Abs (nextDestIntID-destIntID)
+                for i in leaves do
+                    if(Math.Abs (i-destIntID)<d) then
+                        nextDestIntID<-i
+                        d<-Math.Abs (i-destIntID)
 
         if(nextDestIntID=currIntID) then
-            nextID <- null
-            found <- true
+            nextID<-null
+            found<-true
+        else if(nextDestIntID<>(-1)) then
+            nextID<-toBaseString nextDestIntID (int (Math.Pow(2.0,double b))) maxBits
+            found<-true
+
+        //check to see if any node in the leaf sets is closer to the new node than the current node
+        // if (not found) then
+        //     //search in leaf tables first
+        //     //nextDestIntID<-currIntID
+        //     if(destIntID>currIntID) then
+        //         if(not (List.isEmpty largeLeafList)) then
+        //             if(func = "join") then
+        //                 if(destIntID<int("0o" + string (List.last largeLeafList))) then
+        //                     nextDestIntID<-currIntID
+        //                     let mutable d = destIntID-currIntID
+        //                     for i in largeLeafList do
+        //                         if(Math.Abs (int ("0o"+(string i))-destIntID)<d) then
+        //                             d<-Math.Abs (int ("0o"+(string i))-destIntID)
+        //                             nextDestIntID<-int ("0o" + string i)
+        //             else
+        //                 if(destIntID<=int("0o" + string (List.last largeLeafList))) then
+        //                     nextDestIntID<-currIntID
+        //                     let mutable d = destIntID-currIntID
+        //                     for i in largeLeafList do
+        //                         if(Math.Abs (int ("0o"+(string i))-destIntID)<d) then
+        //                             d<-Math.Abs (int ("0o"+(string i))-destIntID)
+        //                             nextDestIntID<-int ("0o" + string i)
+        //     else
+        //         if(not (List.isEmpty smallLeafList)) then
+        //             if(func = "join") then
+        //                 if(destIntID>int("0o" + string (List.head smallLeafList))) then
+        //                     nextDestIntID<-currIntID
+        //                     let mutable d = currIntID-destIntID
+        //                     for i in smallLeafList do
+        //                         if(Math.Abs (int ("0o"+(string i))-destIntID)<d) then
+        //                             d<-Math.Abs (int ("0o"+(string i))-destIntID)
+        //                             nextDestIntID<-int ("0o" + string i)
+        //             else
+        //                 if(destIntID>=int("0o" + string (List.head smallLeafList))) then
+        //                     nextDestIntID<-currIntID
+        //                     let mutable d = currIntID-destIntID
+        //                     for i in smallLeafList do
+        //                         if(Math.Abs (int ("0o"+(string i))-destIntID)<d) then
+        //                             d<-Math.Abs (int ("0o"+(string i))-destIntID)
+        //                             nextDestIntID<-int ("0o" + string i)
+        
+        // if(nextDestIntID<>(-1) && nextDestIntID<>currIntID) then  
+        //     nextID <- toBaseString nextDestIntID (int (Math.Pow(2.0,double b))) maxBits
+        //     found <- true
+        // // if(nextDestIntID<>currIntID) then
+        // //     nextID <- toBaseString nextDestIntID (int (Math.Pow(2.0,double b))) maxBits
+        // //     found <- true
+        
+
+        // if(nextDestIntID=currIntID) then
+        //     nextID <- null
+        //     found <- true
 
         //printfn "aaaaaaaaa"
         if(not found) then
@@ -503,17 +539,17 @@ let parent (mailbox: Actor<_>) =
                 //println(numNodes + " nodes have joined ...\n")
                 //println("Initializing Routing ...\n")
 
-                // for i in joinedNodes do
-                //     let msg = "Hello"
-                //     let id = toBaseString i (int (Math.Pow(2.0,double b))) maxBits
-                //     let peerReference = system.ActorSelection("akka://system/user/"+id) 
-                //     peerReference<!StartRouting(msg,joinedNodes)
-                   
-                for i=0 to totalNodes-1 do
+                for i in joinedNodes do
+                    let msg = "Hello"
                     let id = toBaseString i (int (Math.Pow(2.0,double b))) maxBits
-                    let nextPeerRef = system.ActorSelection("akka://system/user/"+id) 
-                    nextPeerRef<!Print(true)
-                    Threading.Thread.Sleep(1000) 
+                    let peerReference = system.ActorSelection("akka://system/user/"+id) 
+                    peerReference<!StartRouting(msg,joinedNodes)
+                   
+                // for i=0 to totalNodes-1 do
+                //     let id = toBaseString i (int (Math.Pow(2.0,double b))) maxBits
+                //     let nextPeerRef = system.ActorSelection("akka://system/user/"+id) 
+                //     nextPeerRef<!Print(true)
+                //     Threading.Thread.Sleep(100) 
 
                     
 
@@ -540,9 +576,15 @@ let parent (mailbox: Actor<_>) =
                 printfn "AVERAGE HOPS PER ROUTE = %f" (totalHops / (double (totalNodes * totalRequests)))
                 printfn "===================================="
 
+                printfn ""
+                printfn "Press Any Key To Close"
+
+                //Close all actors
+                system.Terminate() |> ignore
+
         return! loop()
     }
     loop()
 
 let parentActor = spawn system "parent" parent
-parentActor <! IntializeParent(3000,10,parentActor)
+parentActor <! IntializeParent(1000,10,parentActor)
